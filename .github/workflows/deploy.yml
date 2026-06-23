@@ -13,11 +13,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Copy index.html to VM
+      - name: Copy file to VM home folder
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.GCP_HOST }}
           username: ${{ secrets.GCP_USERNAME }}
           key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
           source: "index.html"
-          target: "/var/www/html/"
+          target: "/home/${{ secrets.GCP_USERNAME }}/"
+          overwrite: true
+
+      - name: Move file to web folder
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.GCP_HOST }}
+          username: ${{ secrets.GCP_USERNAME }}
+          key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
+          script: |
+            sudo mv /home/$USER/index.html /var/www/html/index.html
+            sudo systemctl restart nginx
