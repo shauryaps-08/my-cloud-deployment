@@ -30,17 +30,6 @@ jobs:
           username: ${{ secrets.GCP_USERNAME }}
           key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
           script: |
-            # Copy frontend to nginx
             sudo cp ~/rtl-simulator/index.html /var/www/html/index.html
-            
-            # Kill existing Flask if running
-            pkill -f "python3 app.py" || true
-            sleep 2
-            
-            # Start Flask fully detached from this SSH session
-            cd ~/rtl-simulator
-            setsid python3 app.py > ~/flask.log 2>&1 < /dev/null &
-            disown
-            
-            sleep 2
+            sudo systemctl restart flask-rtl
             echo "Deployment complete!"
